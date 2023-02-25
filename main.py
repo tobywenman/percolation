@@ -36,7 +36,9 @@ class grid():
         plt.show()
 
     def percolate(self):
+        """helper function for solve which starts the algorithm by checking all of the first row"""
         checked = []
+        found = False
         for i in range(1,self.size[0]+1):
             if self.grid[i,1] == 1 and (i,1) not in checked:
                 checked.append((i,1))
@@ -49,6 +51,7 @@ class grid():
         return found
 
     def solve(self,pos,checked):
+        """function which recursively checks all squares around """
         for i in [0,-1,1]:
             for j in [0,1,-1]:
                 if (pos[0]+i,pos[1]+j) not in checked and self.grid[pos[0]+i,pos[1]+j] == 1:
@@ -58,10 +61,27 @@ class grid():
                     if self.solve((pos[0]+i,pos[1]+j),checked):
                         return True
         return False
+    
+    
+def simulateMany(iters,tests,size):
+        probs = np.zeros((len(tests),2))
+        test = 0
+        for i in tests:
+            print(int(100*test/len(tests)))
+            passes = 0
+            for j in range(iters):
+                newGrid = grid(size,i)
+                if newGrid.percolate():
+                    passes += 1
+            probs[test,0] = i
+            probs[test,1] = passes/iters
+            test += 1
+        
+        return probs
 
+tests = np.linspace(0.1,0.9,50)
 
-newGrid = grid((100,100),0.75)
+result = simulateMany(500,tests,(50,50))
 
-print(newGrid.percolate())
-
-newGrid.draw()
+plt.plot(result[:,0],result[:,1])
+plt.show()
