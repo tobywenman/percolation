@@ -64,29 +64,36 @@ class grid():
     
     def iterativePercolate(self):
 
+        #stores coordinates that need checking
         checkStack = []
 
+        #appends all of the first collumn for checking
         for i in range(1,self.size[0]+1):
             if self.grid[i,1] == 1:
                 checkStack.append((i,1))
                 self.grid[i,1] = 2
         
+        #loops while there is coordinates left to check
         while len(checkStack) > 0:
+            #current coords being checked
             pos = checkStack[0]
+
+            #loop through adjacent squares
             for i in [0,-1,1]:
                 for j in [0,1,-1]:
-                    if self.grid[pos[0]+i,pos[1]+j] == 1:
-                        checkStack.insert(0,(pos[0]+i,pos[1]+j))
-                        self.grid[pos[0]+i,pos[1]+j] = 2
-                        if pos[1]+j == self.size[1]:
+                    if self.grid[pos[0]+i,pos[1]+j] == 1: #checks if square has a particle and hasn't been checked
+                        checkStack.insert(0,(pos[0]+i,pos[1]+j)) #pushes the newly found particle to check stack
+                        self.grid[pos[0]+i,pos[1]+j] = 2 #updates grid so that the next particle has been checked
+                        if pos[1]+j == self.size[1]: # returns if the other side has been reached
                             return True
-                        break
+                        break #breaks when a particle has been found so that the next particle can be checked
                 else:
-                    continue
+                    continue #used to break out of i loop if j loop breaks
                 break
             else:
-                checkStack.pop(0)
-        return False
+                checkStack.pop(0) #removes the current pos from the stack if all possible squares have been checked and no particles are found
+
+        return False #return false if all loops finish and no path is found
 
     
     
