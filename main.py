@@ -62,6 +62,33 @@ class grid():
                         return True
         return False
     
+    def iterativePercolate(self):
+
+        checkStack = []
+
+        for i in range(1,self.size[0]+1):
+            if self.grid[i,1] == 1:
+                checkStack.append((i,1))
+                self.grid[i,1] = 2
+        
+        while len(checkStack) > 0:
+            pos = checkStack[0]
+            for i in [0,-1,1]:
+                for j in [0,1,-1]:
+                    if self.grid[pos[0]+i,pos[1]+j] == 1:
+                        checkStack.insert(0,(pos[0]+i,pos[1]+j))
+                        self.grid[pos[0]+i,pos[1]+j] = 2
+                        if pos[1]+j == self.size[1]:
+                            return True
+                        break
+                else:
+                    continue
+                break
+            else:
+                checkStack.pop(0)
+        return False
+
+    
     
 def simulateMany(iters,tests,size):
         probs = np.zeros((len(tests),2))
@@ -79,9 +106,13 @@ def simulateMany(iters,tests,size):
         
         return probs
 
-tests = np.linspace(0.1,0.9,50)
+# tests = np.linspace(0.1,0.9,50)
 
-result = simulateMany(500,tests,(50,50))
+# result = simulateMany(500,tests,(50,50))
 
-plt.plot(result[:,0],result[:,1])
-plt.show()
+# plt.plot(result[:,0],result[:,1])
+
+newGrid = grid((100,100),0.4)
+print(newGrid.iterativePercolate())
+
+newGrid.draw()
