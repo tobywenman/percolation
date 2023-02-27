@@ -2,13 +2,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import colors
 import random
+import png
 
 class grid():
     """class containing the particle grid and its methods"""
 
     def __init__(self,size,particles):
         #initialise grid
-        self.grid = np.zeros(size)
+        self.grid = np.zeros(size,dtype=np.uint8)
         self.size = size
 
         #calculate number of particles
@@ -79,21 +80,30 @@ class grid():
             pos = checkStack[0]
 
             #loop through adjacent squares
-            for i in [0,-1,1]:
-                for j in [0,1,-1]:
-                    if self.grid[pos[0]+i,pos[1]+j] == 1: #checks if square has a particle and hasn't been checked
-                        checkStack.insert(0,(pos[0]+i,pos[1]+j)) #pushes the newly found particle to check stack
-                        self.grid[pos[0]+i,pos[1]+j] = 2 #updates grid so that the next particle has been checked
-                        if pos[1]+j == self.size[1]: # returns if the other side has been reached
-                            return True
-                        break #breaks when a particle has been found so that the next particle can be checked
-                else:
-                    continue #used to break out of i loop if j loop breaks
-                break
+            for i in [(0,1),(1,1),(-1,1),(1,0),(-1,0),(0,-1),(1,-1),(-1,-1)]:
+                if self.grid[pos[0]+i[0],pos[1]+i[1]] == 1: #checks if square has a particle and hasn't been checked
+                    checkStack.insert(0,(pos[0]+i[0],pos[1]+i[1])) #pushes the newly found particle to check stack
+                    self.grid[pos[0]+i[0],pos[1]+i[1]] = 2 #updates grid so that the next particle has been checked
+                    if pos[1]+i[1] == self.size[1]: # returns if the other side has been reached
+                        return True
+                    break #breaks when a particle has been found so that the next particle can be checked
+
             else:
                 checkStack.pop(0) #removes the current pos from the stack if all possible squares have been checked and no particles are found
 
         return False #return false if all loops finish and no path is found
+    
+    def drawPng(self,fileName):
+        colours = [[255,0,0],[0,0,255],[0,255,0]]
+        rgbArray = np.zeros((self.size[0],self.size[1]*3),dtype=np.uint8)
+
+        for i in range(self.size[0]):
+            for j in range(self.size[1]):
+                for k in range(3):
+                    rgbArray[i,j*3+k] = colours[self.grid[i,j]][k]
+
+        png.from_array(rgbArray,mode="RGB").save(fileName)
+
 
     
     
@@ -119,7 +129,9 @@ def simulateMany(iters,tests,size):
 
 # plt.plot(result[:,0],result[:,1])
 
-newGrid = grid((100,100),0.4)
+newGrid = grid((1080,1920),0.45)
 print(newGrid.iterativePercolate())
 
-newGrid.draw()
+newGrid.drawPng("test.png")
+
+
